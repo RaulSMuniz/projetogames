@@ -3,7 +3,6 @@
  */
 package jogodo.marciano;
 
-import java.util.Arrays;
 import java.util.Scanner;
 import java.util.Random;
 
@@ -11,17 +10,20 @@ public class Marciano {
 
     public static void main(String[] args) {
         int[] record = new int [5];
-        System.out.println(Arrays.toString(record));
         
         Random rng = new Random();
         Scanner userInp = new Scanner(System.in);
+        
         char newGame;
+        
         int maxTries = 0;
         int randomNum, triedNumber, playerTries, option = 0;
         String difficulty = "";
+        
         int triesRecord = 0;
         int timesPlayed = 0;
         int timesPlayedTillRecord = 5;
+        
         do {
             randomNum = rng.nextInt(100) + 1;
             playerTries = 0;
@@ -40,10 +42,10 @@ public class Marciano {
             } else {
                 System.out.println("O recorde de tentativas será desbloqueado após " + (timesPlayedTillRecord - timesPlayed) + " partidas.");
             }
-            
 
             System.out.println("Digite o número da opção escolhida.");
             option = userInp.nextInt();
+            
             if (option == 1) {
                 maxTries = 10;
                 difficulty = "[Fácil]";
@@ -128,12 +130,6 @@ public class Marciano {
                 }
             }
             
-            
-            if (triesRecord == 0){
-                triesRecord = playerTries;
-            } else if (triesRecord > 0 && playerTries < triesRecord){
-                triesRecord = playerTries;
-            }
             userInp.nextLine();
             System.out.print("Deseja jogar novamente: [s/n]: ");
             newGame = userInp.nextLine().toUpperCase().charAt(0);
