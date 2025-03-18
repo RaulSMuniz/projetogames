@@ -3,18 +3,25 @@
  */
 package jogodo.marciano;
 
+import java.util.Arrays;
 import java.util.Scanner;
 import java.util.Random;
 
 public class Marciano {
 
     public static void main(String[] args) {
+        int[] record = new int [5];
+        System.out.println(Arrays.toString(record));
+        
         Random rng = new Random();
         Scanner userInp = new Scanner(System.in);
         char newGame;
         int maxTries = 0;
         int randomNum, triedNumber, playerTries, option = 0;
         String difficulty = "";
+        int triesRecord = 0;
+        int timesPlayed = 0;
+        int timesPlayedTillRecord = 5;
         do {
             randomNum = rng.nextInt(100) + 1;
             playerTries = 0;
@@ -22,6 +29,18 @@ public class Marciano {
             System.out.println("1. Fácil (10 tentativas)");
             System.out.println("2. Médio (7 tentativas)");
             System.out.println("3. Difícil (5 tentativas)");
+            
+            if (timesPlayed >= 5){
+                System.out.println("Seu recorde atual de tentativas: \n"
+                    + "Top 1: " + record[0] + " tentativas totais. \n"
+                    + "Top 2: " + record[1] + " tentativas totais. \n"
+                    + "Top 3: " + record[2] + " tentativas totais. \n"
+                    + "Top 4: " + record[3] + " tentativas totais. \n"
+                    + "Top 5: " + record[4] + " tentativas totais. \n");
+            } else {
+                System.out.println("O recorde de tentativas será desbloqueado após " + (timesPlayedTillRecord - timesPlayed) + " partidas.");
+            }
+            
 
             System.out.println("Digite o número da opção escolhida.");
             option = userInp.nextInt();
@@ -68,7 +87,14 @@ public class Marciano {
                     }
                 }
                 
-                
+                if (playerTries == maxTries && triedNumber != randomNum) {
+                    System.out.println("O marciano estava na árvore: " + randomNum + "\n"
+                            + "O pior aconteceu... \n"
+                            + "O marciano corrompeu toda a Terra através de sua tecnologia alienígena! \n"
+                            + "Caro soldado, este é o fim para todos nós. Foi bom o ter no meu esquadrão durante este tempo.");
+
+                    break;
+                }
 
                 if (triedNumber > randomNum) {
                     System.out.println("Tente um número menor.");
@@ -82,20 +108,36 @@ public class Marciano {
                     System.out.println("Tentativas totais: " + playerTries);
                 }
 
-                if (playerTries == maxTries && triedNumber != randomNum) {
-                    System.out.println("O marciano estava na árvore: " + randomNum + "\n"
-                            + "O pior aconteceu... \n"
-                            + "O marciano corrompeu toda a Terra através de sua tecnologia alienígena! \n"
-                            + "Caro soldado, este é o fim para todos nós. Foi bom o ter no meu esquadrão durante este tempo.");
-
-                    break;
-                }
+                
 
             } while (triedNumber != randomNum);
-
+            if (record[0] == 0){
+                record[0] = playerTries;
+            } else if (record[4] > 0){
+                if (playerTries < record[4]){
+                    record[4] = playerTries;
+                }
+            }
+            for (int i = 1; i < record.length; i++){
+                for (int j = 0; j < i; j++){
+                    if (record[i] < record[j]){
+                        int temp = record[i];
+                        record[i] = record[j];
+                        record[j] = temp;
+                    }  
+                }
+            }
+            
+            
+            if (triesRecord == 0){
+                triesRecord = playerTries;
+            } else if (triesRecord > 0 && playerTries < triesRecord){
+                triesRecord = playerTries;
+            }
             userInp.nextLine();
             System.out.print("Deseja jogar novamente: [s/n]: ");
             newGame = userInp.nextLine().toUpperCase().charAt(0);
+            timesPlayed += 1;
         } while (newGame == 'S');
 
     }
