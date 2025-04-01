@@ -1,0 +1,174 @@
+import java.util.*;
+
+String[] palavras = {"ABACAXI", "BANANA", "MORANGO", "LARANJA", "UVA", "PERA", "MELANCIA"};
+String palavraSorteada;
+char[] palavraEscondida;
+ArrayList<Character> letrasTentadas = new ArrayList<Character>();
+int erros = 0;
+final int MAX_ERROS = 6;
+boolean jogoFinalizado = false;
+
+void setup() {
+  size(900, 650); 
+  sorteiaPalavra();
+}
+
+void sorteiaPalavra() {
+  palavraSorteada = palavras[(int)random(palavras.length)];
+  palavraEscondida = new char[palavraSorteada.length()];
+  Arrays.fill(palavraEscondida, '_');
+  letrasTentadas.clear();
+  erros = 0;
+  jogoFinalizado = false;
+}
+
+void draw() {
+  background(240);
+  desenhaForca();
+  desenhaBoneco();
+  desenhaPalavraEscondida();
+  desenhaTeclado();
+  
+  if (jogoFinalizado) {
+    desenhaMensagemFinal();
+    desenhaBotaoReiniciar();
+  } else {
+    verificaFimJogo();
+  }
+}
+
+void desenhaForca() {
+  stroke(0);
+  strokeWeight(4);
+  // Base
+  line(100, 500, 300, 500);
+  // Poste
+  line(150, 500, 150, 100);
+  // Topo
+  line(150, 100, 300, 100);
+  // Corda
+  line(300, 100, 300, 150);
+}
+
+void desenhaBoneco() {
+  if (erros >= 1) { // Cabeça
+    fill(255);
+    ellipse(300, 180, 60, 60);
+  }
+  if (erros >= 2) { // Corpo
+    line(300, 210, 300, 330);
+  }
+  if (erros >= 3) { // Braço esquerdo
+    line(300, 230, 250, 270);
+  }
+  if (erros >= 4) { // Braço direito
+    line(300, 230, 350, 270);
+  }
+  if (erros >= 5) { // Perna esquerda
+    line(300, 330, 250, 400);
+  }
+  if (erros >= 6) { // Perna direita
+    line(300, 330, 350, 400);
+  }
+}
+
+void desenhaPalavraEscondida() {
+  textSize(32);
+  fill(0);
+  textAlign(CENTER);
+  for (int i = 0; i < palavraEscondida.length; i++) {
+    text(palavraEscondida[i], width/2 - 150 + i * 40, 450);
+  }
+}
+
+void desenhaTeclado() {
+  char[] letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
+  for (int i = 0; i < letras.length; i++) {
+    int x = 50 + (i % 13) * 60;
+    int y = 510 + (i / 13) * 60;
+    
+    if (letrasTentadas.contains(letras[i])) {
+      if (palavraSorteada.indexOf(letras[i]) >= 0) {
+        fill(0, 255, 0); // Verde (acertou)
+      } else {
+        fill(255, 0, 0); // Vermelho (errou)
+      }
+    } else {
+      fill(200); // Cinza (não tentada)
+    }
+    
+    rect(x, y, 50, 50, 5);
+    fill(0);
+    textSize(20);
+    text(letras[i], x + 25, y + 30);
+  }
+}
+
+void mousePressed() {
+  if (jogoFinalizado) {
+    // Verifica clique no botão de reinício
+    if (mouseX >= width/2 - 70 && mouseX <= width/2 + 70 && 
+        mouseY >= 470 && mouseY <= 520) {
+      sorteiaPalavra();
+    }
+    return;
+  }
+  
+  char[] letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
+  for (int i = 0; i < letras.length; i++) {
+    int x = 50 + (i % 13) * 60;
+    int y = 510 + (i / 13) * 60;
+    
+    if (mouseX >= x && mouseX <= x + 50 && mouseY >= y && mouseY <= y + 50) {
+      char letra = letras[i];
+      if (!letrasTentadas.contains(letra)) {
+        letrasTentadas.add(letra);
+        boolean acertou = false;
+        
+        for (int j = 0; j < palavraSorteada.length(); j++) {
+          if (palavraSorteada.charAt(j) == letra) {
+            palavraEscondida[j] = letra;
+            acertou = true;
+          }
+        }
+        
+        if (!acertou) erros++;
+      }
+    }
+  }
+}
+
+void verificaFimJogo() {
+  if (erros >= MAX_ERROS || !new String(palavraEscondida).contains("_")) {
+    jogoFinalizado = true;
+  }
+}
+
+void desenhaMensagemFinal() {
+  fill(0, 150);
+  rect(0, 380, width, 80);
+  
+  textSize(32);
+  textAlign(CENTER);
+  if (erros >= MAX_ERROS) {
+    fill(255, 100, 100);
+    text("Game Over! A palavra era: " + palavraSorteada, width/2, 420);
+  } else {
+    fill(100, 255, 100);
+    text("Parabéns! Você acertou!", width/2, 420);
+  }
+}
+
+void desenhaBotaoReiniciar() {
+  fill(70, 130, 200);
+  rect(width/2 - 70, 470, 140, 50, 10);
+  fill(255);
+  textSize(20);
+  text("Reiniciar", width/2, 500);
+}
+
+void keyPressed() {
+  if (key == ' ' && jogoFinalizado) {
+    sorteiaPalavra();
+  }
+}
