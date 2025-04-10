@@ -27,6 +27,7 @@ void setup() {
   size(800, 500);
   textFont(createFont("Arial", 20));
   xPalhetaDir = width - 40;
+  alturaPalheta = 80; // Definir valor inicial para alturaPalheta
 }
 
 void draw() {
@@ -61,7 +62,9 @@ void mostrarMenu() {
   textSize(20);
   text("Pressione 1 para Player vs Player", width/2, height/2 - 20);
   text("Pressione 2 para Player vs IA", width/2, height/2 + 20);
-}
+  text("Dificuldade: " + (dificuldade == 1 ? "Fácil" : dificuldade == 2 ? "Médio" : "Difícil"), width/2, height/2 + 60);
+  text("Pressione + ou - para alterar dificuldade", width/2, height/2 + 90);
+} 
 
 void iniciarJogo() {
   xBola = width/2;
@@ -112,11 +115,11 @@ void moverPalhetas() {
 void verificarColisao() {
   if (xBola - raio < xPalhetaEsq + larguraPalheta &&
       yBola > yPalhetaEsq && yBola < yPalhetaEsq + alturaPalheta) {
-    velocidadeX *= -1;
+    velocidadeX = abs(velocidadeX); // Garante que a bola sempre vá para a direita
   }
   if (xBola + raio > xPalhetaDir &&
       yBola > yPalhetaDir && yBola < yPalhetaDir + alturaPalheta) {
-    velocidadeX *= -1;
+    velocidadeX = -abs(velocidadeX); // Garante que a bola sempre vá para a esquerda
   }
 }
 
@@ -124,11 +127,15 @@ void verificarPonto() {
   if (xBola < 0) {
     pontosDir++;
     checarVencedor();
-    iniciarJogo();
+    if (jogoAtivo) { // Só reinicia se o jogo ainda estiver ativo
+      iniciarJogo();
+    }
   } else if (xBola > width) {
     pontosEsq++;
     checarVencedor();
-    iniciarJogo();
+    if (jogoAtivo) {
+      iniciarJogo();
+    }
   }
 }
 
@@ -171,11 +178,14 @@ void keyPressed() {
       pontosEsq = 0;
       pontosDir = 0;
       iniciarJogo();
+    } else if (key == '+' || key == '=') {
+      dificuldade = constrain(dificuldade + 1, 1, 3);
+    } else if (key == '-' || key == '_') {
+      dificuldade = constrain(dificuldade - 1, 1, 3);
     }
   } else if (!jogoAtivo && key == ENTER) {
     pontosEsq = 0;
     pontosDir = 0;
-    jogoAtivo = false;
     menuAtivo = true;
   }
 
@@ -197,13 +207,16 @@ void definirDificuldade(int nivel) {
     alturaPalheta = 120;
     velocidadeInicialX = 4;
     velocidadeInicialY = 2;
+    velocidadePalheta = 4;
   } else if (nivel == 2) {
     alturaPalheta = 80;
     velocidadeInicialX = 5;
     velocidadeInicialY = 3;
+    velocidadePalheta = 5;
   } else if (nivel == 3) {
     alturaPalheta = 60;
     velocidadeInicialX = 6;
     velocidadeInicialY = 4;
+    velocidadePalheta = 6;
   }
 }
